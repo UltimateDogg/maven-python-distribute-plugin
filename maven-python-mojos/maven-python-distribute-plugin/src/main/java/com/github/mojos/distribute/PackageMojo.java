@@ -16,94 +16,144 @@ package com.github.mojos.distribute;
  * limitations under the License.
  */
 
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.io.IOUtils;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProject;
+
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
-
-import lombok.Getter;
-import lombok.Setter;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * Packages a Python module using distribute
- * 
+ *
  * @goal package
  * @phase package
  */
 public class PackageMojo extends AbstractMojo {
 
-	private static final String VERSION = "${VERSION}";
-	
-	/**
-	 * @parameter expression="${project.version}"
-	 * @required
-	 */
-	private String projectVersion;
-	
-	/**
-	 * Allows overriding the default version
-	 */
-	@Getter @Setter private String version = null;
+    private static final String PROJECT_NAME = "${PROJECT_NAME}";
+    private static final String VERSION = "${VERSION}";
 
-	/* (non-Javadoc)
-	 * @see org.apache.maven.plugin.AbstractMojo#execute()
-	 */
-	public void execute() throws MojoExecutionException, MojoFailureException {
-	
-		File setup = new File("src/main/python/setup.py");
-		
-		try {
-			
-			if (version != null) {
-				version = projectVersion;
-			}
-			
-			
-			//update VERSION to latest version
-			List<String> lines = IOUtils.readLines(new BufferedInputStream(new FileInputStream(setup)));
-			for(String line : lines) {
-				if (line.contains(VERSION)) {
-					line = line.replace(VERSION,version);
-				}
-			}
-			IOUtils.writeLines(lines,"\n", new BufferedOutputStream(new FileOutputStream(setup)));
-			
-			//execute setup script
-			ProcessBuilder t = new ProcessBuilder("python","setup.py","bdist_egg");
-			t.directory(new File("src/test/python"));
-			t.redirectErrorStream(true);
+    /**
+     * @parameter default-value="${project.version}"
+     * @required
+     */
+    private String packageVersion;
 
-			Process pr = t.start();
-			int exitCode = pr.waitFor();
-			BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-			String line = "";
-			while ((line = buf.readLine()) != null) {
-				getLog().info(line);
-			}
-			
-			if (exitCode != 0) {
-				throw new MojoExecutionException("python setup.py returned error code " + exitCode);
-			}
-			
-		} catch (FileNotFoundException e) {
-			throw new MojoExecutionException("Unable to find " + setup.getPath(),e);
-		} catch (IOException e) {
-			throw new MojoExecutionException("Unable to read " + setup.getPath(),e);		
-		} catch (InterruptedException e) {
-			throw new MojoExecutionException("Unable to execute python " + setup.getPath(),e);
-		}
-	
-		
-	}
+    /**
+     * Allows overriding the default version
+     */
+    @Getter
+    @Setter
+    private String version;
+
+    /**
+     * @parameter default-value="${project}"
+     * @required
+     * @readonly
+     */
+    private MavenProject project;
+
+    /**
+     * @parameter default-value="${project.basedir}/src/main/python"
+     * @required
+     */
+    private String sourceDirectory;
+
+    /**
+     * @parameter default-value="${project.artifactId}"
+     * @required
+     */
+    private String packageName;
+
+    /* (non-Javadoc)
+     * @see org.apache.maven.plugin.AbstractMojo#execute()
+     */
+    public void execute() throws MojoExecutionException, MojoFailureException {
+
+        if (version != null) {
+            packageVersion = version;
+        }
+
+        final File setup = Paths.get(sourceDirectory, "setup.py").toFile();
+        final boolean setupProvided = setup.exists();
+
+        final File setupTemplate = setupProvided ? setup : Paths.get(sourceDirectory, "setup-template.py").toFile();
+        final File buildDirectory = Paths.get(project.getBuild().getDirectory(), "py").toFile();
+        buildDirectory.mkdirs();
+
+        try {
+            if (!setupProvided) {
+                //update VERSION to latest version
+                List<String> lines = new ArrayList<String>();
+                final InputStream inputStream = new BufferedInputStream(new FileInputStream(setupTemplate));
+                try {
+                    lines.addAll(IOUtils.readLines(inputStream));
+                } finally {
+                    inputStream.close();
+                }
+
+                int index = 0;
+                for (String line : lines) {
+                    line = line.replace(VERSION, packageVersion);
+                    line = line.replace(PROJECT_NAME, packageName);
+                    lines.set(index, line);
+                    index++;
+                }
+
+                final OutputStream outputStream = new FileOutputStream(setup);
+                try {
+                    IOUtils.writeLines(lines, "\n", outputStream);
+                } finally {
+                    outputStream.flush();
+                    outputStream.close();
+                }
+            }
+
+            //execute setup script
+            ProcessBuilder processBuilder = new ProcessBuilder("python", setup.getCanonicalPath(), "bdist_egg");
+            processBuilder.directory(buildDirectory);
+            processBuilder.redirectErrorStream(true);
+
+            Process pr = processBuilder.start();
+            int exitCode = pr.waitFor();
+            BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+            String line = "";
+            while ((line = buf.readLine()) != null) {
+                getLog().info(line);
+            }
+
+            if (exitCode != 0) {
+                throw new MojoExecutionException("python setup.py returned error code " + exitCode);
+            }
+
+        } catch (FileNotFoundException e) {
+            throw new MojoExecutionException("Unable to find " + setup.getPath(), e);
+        } catch (IOException e) {
+            throw new MojoExecutionException("Unable to read " + setup.getPath(), e);
+        } catch (InterruptedException e) {
+            throw new MojoExecutionException("Unable to execute python " + setup.getPath(), e);
+        } finally {
+            if (!setupProvided) {
+                setup.delete();
+            }
+        }
+
+
+    }
 }
