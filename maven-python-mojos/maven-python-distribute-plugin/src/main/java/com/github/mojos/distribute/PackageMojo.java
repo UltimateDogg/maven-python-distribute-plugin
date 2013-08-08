@@ -18,6 +18,7 @@ package com.github.mojos.distribute;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -34,6 +35,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,12 +93,20 @@ public class PackageMojo extends AbstractMojo {
             packageVersion = version;
         }
 
-        final File setup = Paths.get(sourceDirectory, "setup.py").toFile();
+        //Copy sourceDirectory
+        final File sourceDirectoryFile = new File(sourceDirectory);
+        final File buildDirectory = Paths.get(project.getBuild().getDirectory(), "py").toFile();
+
+        try {
+            FileUtils.copyDirectory(sourceDirectoryFile, buildDirectory);
+        } catch (IOException e) {
+            throw new MojoExecutionException("Failed to copy source", e);
+        }
+
+        final File setup = Paths.get(buildDirectory.getPath(), "setup.py").toFile();
         final boolean setupProvided = setup.exists();
 
-        final File setupTemplate = setupProvided ? setup : Paths.get(sourceDirectory, "setup-template.py").toFile();
-        final File buildDirectory = Paths.get(project.getBuild().getDirectory(), "py").toFile();
-        buildDirectory.mkdirs();
+        final File setupTemplate = setupProvided ? setup : Paths.get(buildDirectory.getPath(), "setup-template.py").toFile();
 
         try {
             if (!setupProvided) {
@@ -148,10 +159,6 @@ public class PackageMojo extends AbstractMojo {
             throw new MojoExecutionException("Unable to read " + setup.getPath(), e);
         } catch (InterruptedException e) {
             throw new MojoExecutionException("Unable to execute python " + setup.getPath(), e);
-        } finally {
-            if (!setupProvided) {
-                setup.delete();
-            }
         }
 
 
