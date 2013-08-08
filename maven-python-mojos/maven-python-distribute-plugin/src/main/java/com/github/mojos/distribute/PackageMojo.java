@@ -84,6 +84,12 @@ public class PackageMojo extends AbstractMojo {
      */
     private String packageName;
 
+    /**
+     * @parameter default-value="python"
+     * @required
+     */
+    private String pythonExecutable;
+
     /* (non-Javadoc)
      * @see org.apache.maven.plugin.AbstractMojo#execute()
      */
@@ -137,7 +143,7 @@ public class PackageMojo extends AbstractMojo {
             }
 
             //execute setup script
-            ProcessBuilder processBuilder = new ProcessBuilder("python", setup.getCanonicalPath(), "bdist_egg");
+            ProcessBuilder processBuilder = new ProcessBuilder(pythonExecutable, setup.getCanonicalPath(), "bdist_egg");
             processBuilder.directory(buildDirectory);
             processBuilder.redirectErrorStream(true);
 
