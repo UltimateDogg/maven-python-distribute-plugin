@@ -1,7 +1,12 @@
 .metadata/
 .settings/
+.project
+.classpath
 *.class
 *.pyc
 target/
+.idea
+*.iml
 RemoteSystemsTempFiles
+.DS_Store
 
