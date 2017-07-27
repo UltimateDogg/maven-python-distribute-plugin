@@ -1,16 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.github.ultimatedogg</groupId>
-    <artifactId>maven-python-mojos</artifactId>
-    <version>1.5</version>
-    <packaging>pom</packaging>
-
-    <name>Parent Maven Python Mojos</name>
-    <description>Parent Module for all Maven Python Mojos</description>
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.github.ultimatedogg</groupId>
+	<artifactId>maven-python-distribute-plugin</artifactId>
+	<version>0.1.5</version>
+	<packaging>maven-plugin</packaging>
+	<name>Maven Python Distribute Plugin</name>
     <url>https://github.com/jacek99/Maven-Python-Mojos</url>
-
+    <description>Allows to package and distribute Python modules during Maven builds</description>
+    
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -18,10 +18,6 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-
-    <modules>
-        <module>maven-python-distribute-plugin</module>
-    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -34,10 +30,8 @@
             <email>jacek99@gmail.com</email>
         </contributor>
     </contributors>
-
-    <dependencyManagement>
-        <dependencies>
-
+    
+	<dependencies>
             <dependency>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-project</artifactId>
@@ -74,7 +68,6 @@
                 <version>1.1</version>
                 <scope>compile</scope>
             </dependency>
-
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
@@ -86,12 +79,10 @@
                 <artifactId>maven-core</artifactId>
                 <version>2.2.1</version>
             </dependency>
+	</dependencies>
 
-        </dependencies>
-    </dependencyManagement>
-
-    <build>
-        <plugins>
+	<build>
+		<plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -104,6 +95,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>2.5.1</version>
+                <configuration>
+					<goalPrefix>distribute</goalPrefix>
+				</configuration>
                 <executions>
                     <execution>
                         <id>generated-helpmojo</id>
@@ -142,25 +136,20 @@
                     </execution>
                 </executions>
             </plugin>
-
-        </plugins>
-
-        <extensions>
+		</plugins>
+		<extensions>
             <extension>
                 <groupId>org.jvnet.wagon-svn</groupId>
                 <artifactId>wagon-svn</artifactId>
                 <version>1.9</version>
             </extension>
         </extensions>
+	</build>
 
-    </build>
-    
     <distributionManagement>
         <repository>
             <id>googlecode</id>
             <url>svn:https://javabuilders.googlecode.com/svn/repo</url>
         </repository>
     </distributionManagement>
-
-
 </project>
