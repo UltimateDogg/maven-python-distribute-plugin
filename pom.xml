@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.ultimatedogg</groupId>
 	<artifactId>maven-python-distribute-plugin</artifactId>
-	<version>0.1.5</version>
+	<version>0.1.6</version>
 	<packaging>maven-plugin</packaging>
 	<name>Maven Python Distribute Plugin</name>
     <url>https://github.com/jacek99/Maven-Python-Mojos</url>
