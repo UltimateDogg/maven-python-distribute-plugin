@@ -10,11 +10,6 @@ or site & documentation generation.
 Plugins
 -------
 The following plugins are offered:
-
-* BDD plugin : https://github.com/jacek99/maven-python-mojos/tree/master/maven-python-mojos/maven-bdd-plugin/
-
-	Allows writing of integration/acceptable tests in plain English and then executing them via such
-	Python BDD frameworks as Nose/Freshen or Lettuce
 	
 * Distribute plugin: https://github.com/jacek99/maven-python-mojos/tree/master/maven-python-mojos/maven-python-distribute-plugin/
 
