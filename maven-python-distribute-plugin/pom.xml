@@ -5,14 +5,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>maven-python-mojos</artifactId>
-		<groupId>maven-python-mojos</groupId>
-		<version>1.4</version>
+		<groupId>com.github.ultimatedogg</groupId>
+		<version>1.5</version>
         <relativePath>../pom.xml</relativePath>
 	</parent>
-
-	<groupId>maven-python-mojos</groupId>
 	<artifactId>maven-python-distribute-plugin</artifactId>
-	<version>0.1.4</version>
+	<version>0.1.5</version>
 	<packaging>maven-plugin</packaging>
 	<name>Maven Python Distribute Plugin</name>
 
