@@ -21,7 +21,6 @@
 
     <modules>
         <module>maven-python-distribute-plugin</module>
-        <!--module>maven-bdd-plugin</module-->
     </modules>
 
     <properties>
