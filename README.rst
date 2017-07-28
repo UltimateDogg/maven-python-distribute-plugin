@@ -1,7 +1,7 @@
 Maven Python Distribute Plugin
 ==============================
 
-**version**: 0.1.1
+**version**: 0.1.8
 
 This plugin integrates the Python **distribute** module into the Maven build:
 
@@ -39,13 +39,20 @@ Add the following to your *pom.xml* build section:
 setup.py
 --------
 
-Set the *version* field in your *setup.py* to a hardcoded constant of **${VERSION}**, e.g.
+To make the code runnable outside maven you can have a setup.py
+
+setup-template.py
+--------
+
+setup template allows for using maven controlled variables in your setup.py file.
+Set the *version* field in your *setup-template.py* to a hardcoded constant of **${VERSION}**, e.g.
+Set the *name* field in your *setup-template.py* to a hardcoded constant of **${PROJECT_NAME}**, e.g.
 ::
 	from setuptools import setup, find_packages
 	
 	setup(
 	      install_requires=['distribute'],
-	      name = 'my-library',
+	      name = '${PROJECT_NAME}',
 	      version = '${VERSION}',
 	      packages = find_packages('.')
 	)
@@ -60,8 +67,8 @@ Add the following plugin repository to your *pom.xml* in order to use this plugi
 
 	<pluginRepositories>
 		<pluginRepository>
-			<id>javabuilders</id>
-			<url>http://javabuilders.googlecode.com/svn/repo</url>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
 		</pluginRepository>
 	</pluginRepositories>
 

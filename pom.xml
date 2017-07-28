@@ -3,153 +3,177 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.github.ultimatedogg</groupId>
+	<groupId>com.github.UltimateDogg</groupId>
 	<artifactId>maven-python-distribute-plugin</artifactId>
-	<version>0.1.6</version>
+	<version>0.1.8</version>
 	<packaging>maven-plugin</packaging>
 	<name>Maven Python Distribute Plugin</name>
-    <url>https://github.com/jacek99/Maven-Python-Mojos</url>
-    <description>Allows to package and distribute Python modules during Maven builds</description>
-    
-    <licenses>
-        <license>
-            <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+	<url>https://github.com/UltimateDogg/maven-python-distribute-plugin</url>
+	<description>Allows to package and distribute Python modules during Maven builds</description>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
-    </properties>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
-    <contributors>
-        <contributor>
-            <name>Jacek Furmankiewicz</name>
-            <email>jacek99@gmail.com</email>
-        </contributor>
-    </contributors>
-    
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.javadoc.failOnError>false</maven.javadoc.failOnError>
+	</properties>
+
+	<contributors>
+		<contributor>
+			<name>Jacek Furmankiewicz</name>
+			<email>jacek99@gmail.com</email>
+		</contributor>
+	</contributors>
+
 	<dependencies>
-            <dependency>
-                <groupId>org.apache.maven</groupId>
-                <artifactId>maven-project</artifactId>
-                <version>2.0.6</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven</groupId>
-                <artifactId>maven-plugin-api</artifactId>
-                <version>2.0</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>0.11.2</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>2.0</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.google.collections</groupId>
-                <artifactId>google-collections</artifactId>
-                <version>1.0</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.javatuples</groupId>
-                <artifactId>javatuples</artifactId>
-                <version>1.1</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.7</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven</groupId>
-                <artifactId>maven-core</artifactId>
-                <version>2.2.1</version>
-            </dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-project</artifactId>
+			<version>2.0.6</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-plugin-api</artifactId>
+			<version>2.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>0.11.2</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.collections</groupId>
+			<artifactId>google-collections</artifactId>
+			<version>1.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.javatuples</groupId>
+			<artifactId>javatuples</artifactId>
+			<version>1.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.7</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-core</artifactId>
+			<version>2.2.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-plugin-plugin</artifactId>
-                <version>2.5.1</version>
-                <configuration>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
 					<goalPrefix>distribute</goalPrefix>
 				</configuration>
-                <executions>
-                    <execution>
-                        <id>generated-helpmojo</id>
-                        <goals>
-                            <goal>helpmojo</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+				<executions>
+					<execution>
+						<id>generated-helpmojo</id>
+						<goals>
+							<goal>helpmojo</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<links>
+						<link>http://docs.oracle.com/javase/8/docs/api/</link>
+					</links>
+					<excludePackageNames>org.apache.calcite.sql.parser.impl</excludePackageNames>
+					<additionalparam>-Xdoclint:none</additionalparam>
+					<tags>
+						<tag>
+							<name>goal</name>
+							<placement>a</placement>
+							<head>Goal:</head>
+						</tag>
+						<tag>
+							<name>phase</name>
+							<placement>a</placement>
+							<head>Phase:</head>
+						</tag>
+						<tag>
+							<name>requiresProject</name>
+							<placement>a</placement>
+							<head>Requires Project:</head>
+						</tag>
+					</tags>
+				</configuration>
+			</plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.1.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 		<extensions>
-            <extension>
-                <groupId>org.jvnet.wagon-svn</groupId>
-                <artifactId>wagon-svn</artifactId>
-                <version>1.9</version>
-            </extension>
-        </extensions>
+			<extension>
+				<groupId>org.jvnet.wagon-svn</groupId>
+				<artifactId>wagon-svn</artifactId>
+				<version>1.9</version>
+			</extension>
+		</extensions>
 	</build>
 
-    <distributionManagement>
-        <repository>
-            <id>googlecode</id>
-            <url>svn:https://javabuilders.googlecode.com/svn/repo</url>
-        </repository>
-    </distributionManagement>
+	<distributionManagement>
+		<repository>
+			<id>googlecode</id>
+			<url>svn:https://javabuilders.googlecode.com/svn/repo</url>
+		</repository>
+	</distributionManagement>
 </project>

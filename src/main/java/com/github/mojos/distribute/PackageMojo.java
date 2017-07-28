@@ -35,8 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,6 +87,12 @@ public class PackageMojo extends AbstractMojo {
      * @required
      */
     private String pythonExecutable;
+    
+    /**
+     * @parameter default-value="egg"
+     * @required
+     */
+    private String distributionType;
 
     /* (non-Javadoc)
      * @see org.apache.maven.plugin.AbstractMojo#execute()
@@ -109,13 +113,15 @@ public class PackageMojo extends AbstractMojo {
             throw new MojoExecutionException("Failed to copy source", e);
         }
 
-        final File setup = Paths.get(buildDirectory.getPath(), "setup.py").toFile();
-        final boolean setupProvided = setup.exists();
+        final File setupTemplate = Paths.get(buildDirectory.getPath(), "setup-template.py").toFile();
+        final boolean setupTemplateProvided = setupTemplate.exists();
 
-        final File setupTemplate = setupProvided ? setup : Paths.get(buildDirectory.getPath(), "setup-template.py").toFile();
+        final File setup = Paths.get(buildDirectory.getPath(), "setup.py").toFile();
+
+        final File setupOutput = setupTemplateProvided ? Paths.get(buildDirectory.getPath(), "setup-output.py").toFile() : setup;
 
         try {
-            if (!setupProvided) {
+            if (setupTemplateProvided) {
                 //update VERSION to latest version
                 List<String> lines = new ArrayList<String>();
                 final InputStream inputStream = new BufferedInputStream(new FileInputStream(setupTemplate));
@@ -133,7 +139,7 @@ public class PackageMojo extends AbstractMojo {
                     index++;
                 }
 
-                final OutputStream outputStream = new FileOutputStream(setup);
+                final OutputStream outputStream = new FileOutputStream(setupOutput);
                 try {
                     IOUtils.writeLines(lines, "\n", outputStream);
                 } finally {
@@ -141,9 +147,18 @@ public class PackageMojo extends AbstractMojo {
                     outputStream.close();
                 }
             }
-
+            
+            String bdistName = null;
+            if(distributionType.equals("egg")) {
+            	bdistName = "bdist_egg";
+            } else if(distributionType.equals("wheel")) {
+            	bdistName = "bdist_wheel";
+            } else {
+                throw new MojoExecutionException("invalid distributionType (egg or wheel supported): " + distributionType);
+            }
+            
             //execute setup script
-            ProcessBuilder processBuilder = new ProcessBuilder(pythonExecutable, setup.getCanonicalPath(), "bdist_egg");
+            ProcessBuilder processBuilder = new ProcessBuilder(pythonExecutable, setupOutput.getCanonicalPath(), bdistName);
             processBuilder.directory(buildDirectory);
             processBuilder.redirectErrorStream(true);
 
@@ -160,11 +175,11 @@ public class PackageMojo extends AbstractMojo {
             }
 
         } catch (FileNotFoundException e) {
-            throw new MojoExecutionException("Unable to find " + setup.getPath(), e);
+            throw new MojoExecutionException("Unable to find " + setupOutput.getPath(), e);
         } catch (IOException e) {
-            throw new MojoExecutionException("Unable to read " + setup.getPath(), e);
+            throw new MojoExecutionException("Unable to read " + setupOutput.getPath(), e);
         } catch (InterruptedException e) {
-            throw new MojoExecutionException("Unable to execute python " + setup.getPath(), e);
+            throw new MojoExecutionException("Unable to execute python " + setupOutput.getPath(), e);
         }
 
 
