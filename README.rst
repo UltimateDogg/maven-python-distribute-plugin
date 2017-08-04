@@ -1,7 +1,7 @@
 Maven Python Distribute Plugin
 ==============================
 
-**version**: 0.1.8
+**version**: 0.2.0
 
 This plugin integrates the Python **distribute** module into the Maven build:
 
@@ -13,7 +13,7 @@ which is useful for IT shops that develop in both of these languages.
 Functionality
 -------------
 
-* keeps the *setup.py* version in sync with the Maven project version
+* keeps the *setup.py* version in sync with the Maven project version by updating setup.py in the **process-sources** phase
 * packages the Python module during the Maven **package** phase
 * allows specifying which format should the Python module be distributed as: source, RPM, egg, tar, zip, etc.
 
@@ -29,8 +29,15 @@ Add the following to your *pom.xml* build section:
 		<version>..</version>
 		<executions>
 			<execution>
+				<id>package</id>
 				<goals>
 					<goal>package</goal>
+				</goals>
+			</execution>
+			<execution>
+				<id>process</id>
+				<goals>
+					<goal>process-sources</goal>
 				</goals>
 			</execution>
 		</executions>
@@ -39,7 +46,8 @@ Add the following to your *pom.xml* build section:
 setup.py
 --------
 
-To make the code runnable outside maven you can have a setup.py
+To make the code runnable outside maven you can have a setup.py. If a setup-template.py is there in 
+your source root setup.py will be replaced.
 
 setup-template.py
 --------
