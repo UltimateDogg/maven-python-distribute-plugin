@@ -18,7 +18,6 @@ package com.github.mojos.distribute;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 
 import java.io.BufferedReader;
@@ -27,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Packages a Python module using distribute
@@ -47,7 +47,7 @@ public class PackageMojo extends AbstractMojo {
      * @required
      */
     private String pythonExecutable;
-    
+
     /**
      * @parameter default-value="egg"
      * @required
@@ -57,37 +57,43 @@ public class PackageMojo extends AbstractMojo {
     /* (non-Javadoc)
      * @see org.apache.maven.plugin.AbstractMojo#execute()
      */
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    @Override
+    public void execute() throws MojoExecutionException {
         final File buildDirectory = Paths.get(project.getBuild().getDirectory(), "maven-python").toFile();
         final String setupOutputCanonicalPath = project.getProperties().getProperty("python.distribute.plugin.setup.path");
-        
-        try {           
-            String bdistName = null;
-            if(distributionType.equals("egg")) {
-            	bdistName = "bdist_egg";
-            } else if(distributionType.equals("wheel")) {
-            	bdistName = "bdist_wheel";
-            } else {
-                throw new MojoExecutionException("invalid distributionType (egg or wheel supported): " + distributionType);
+
+        try {
+            String bdistName;
+            switch(distributionType) {
+                case "egg":
+                    bdistName = "bdist_egg";
+                    break;
+                case "wheel":
+                    bdistName = "bdist_wheel";
+                    break;
+                default:
+                    throw new MojoExecutionException("invalid distributionType (egg or wheel supported): " + distributionType);
             }
-            
+
             //execute setup script
             ProcessBuilder processBuilder = new ProcessBuilder(pythonExecutable, setupOutputCanonicalPath, bdistName);
             processBuilder.directory(buildDirectory);
-            processBuilder.redirectErrorStream(true);
 
             Process pr = processBuilder.start();
-            int exitCode = pr.waitFor();
-            BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-            String line = "";
-            while ((line = buf.readLine()) != null) {
-                getLog().info(line);
+            BufferedReader stdout = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+            BufferedReader stderr = new BufferedReader(new InputStreamReader(pr.getErrorStream()));
+            while (!pr.waitFor(100, TimeUnit.MILLISECONDS)) {
+                stdout.lines().forEachOrdered(line->getLog().info(line));
+                stderr.lines().forEachOrdered(line->getLog().error(line));
             }
 
+            stdout.lines().forEachOrdered(line->getLog().debug(line));
+            stderr.lines().forEachOrdered(line->getLog().warn(line));
+
+            int exitCode = pr.exitValue();
             if (exitCode != 0) {
                 throw new MojoExecutionException("python setup.py returned error code " + exitCode);
             }
-
         } catch (FileNotFoundException e) {
             throw new MojoExecutionException("Unable to find " + setupOutputCanonicalPath, e);
         } catch (IOException e) {
