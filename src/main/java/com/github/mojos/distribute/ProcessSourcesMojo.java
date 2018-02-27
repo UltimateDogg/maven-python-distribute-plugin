@@ -1,7 +1,7 @@
 package com.github.mojos.distribute;
 
 /*
- * Copyright 2001-2005 The Apache Software Foundation.
+ * Copyright 2001-2018 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,12 +107,9 @@ public class ProcessSourcesMojo extends AbstractMojo {
         try {
             if (setupTemplateProvided) {
                 //update VERSION to latest version
-                List<String> lines = new ArrayList<String>();
-                final InputStream inputStream = new BufferedInputStream(new FileInputStream(setupTemplate));
-                try {
+                List<String> lines = new ArrayList<>();
+                try (InputStream inputStream = new BufferedInputStream(new FileInputStream(setupTemplate))) {
                     lines.addAll(IOUtils.readLines(inputStream));
-                } finally {
-                    inputStream.close();
                 }
 
                 int index = 0;
