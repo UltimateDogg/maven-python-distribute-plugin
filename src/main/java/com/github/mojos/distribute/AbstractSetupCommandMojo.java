@@ -95,4 +95,11 @@ public abstract class AbstractSetupCommandMojo extends AbstractMojo {
             throw new MojoExecutionException("Unable to execute python " + setupOutputCanonicalPath, e);
         }
     }
+
+    private void logErrorOrWarning(String line) {
+        if (line.toLowerCase().contains("error"))
+            getLog().error(line);
+        else
+            getLog().warn(line);
+    }
 }
