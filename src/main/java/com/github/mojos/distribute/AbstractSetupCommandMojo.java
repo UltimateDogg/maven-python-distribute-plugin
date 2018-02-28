@@ -61,7 +61,7 @@ public abstract class AbstractSetupCommandMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException {
         final File buildDirectory = Paths.get(project.getBuild().getDirectory(), "maven-python").toFile();
-        final String setupOutputCanonicalPath = project.getProperties().getProperty("python.distribute.plugin.setup.path");
+        final String setupOutputCanonicalPath = project.getProperties().getProperty("python.distribute.plugin.setup.path", "src/main/python/setup.py");
 
         try {
             List<String> args = new ArrayList<>();

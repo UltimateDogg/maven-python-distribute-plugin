@@ -39,6 +39,7 @@ public class PackageMojo extends AbstractSetupCommandMojo {
             case "wheel":
             case "wininst":
             case "rpm":
+            case "dumb":
                 return "bdist_" + distributionType;
             case "bdist":
                 return "bdist";
@@ -47,7 +48,7 @@ public class PackageMojo extends AbstractSetupCommandMojo {
             case "docs":
                 return "build_sphinx";
             default:
-                throw new MojoExecutionException("Invalid distributionType (egg, wheel, wininst, rpm, bdist, source, or docs supported): " + distributionType);
+                throw new MojoExecutionException("Invalid distributionType (egg, wheel, wininst, rpm, bdist, dumb, source, or docs supported): " + distributionType);
         }
     }
 
