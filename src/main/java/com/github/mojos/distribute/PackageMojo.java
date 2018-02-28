@@ -1,7 +1,7 @@
 package com.github.mojos.distribute;
 
 /*
- * Copyright 2001-2005 The Apache Software Foundation.
+ * Copyright 2001-2018 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,9 @@ package com.github.mojos.distribute;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
 /**
  * Packages a Python module using distribute
@@ -34,72 +26,39 @@ import java.util.concurrent.TimeUnit;
  * @goal package
  * @phase package
  */
-public class PackageMojo extends AbstractMojo {
-    /**
-     * @parameter default-value="${project}"
-     * @required
-     * @readonly
-     */
-    private MavenProject project;
-
-    /**
-     * @parameter default-value="python"
-     * @required
-     */
-    private String pythonExecutable;
-
+public class PackageMojo extends AbstractSetupCommandMojo {
     /**
      * @parameter default-value="egg"
      * @required
      */
     private String distributionType;
 
+    static String getDistributionTypeArg(String distributionType) throws MojoExecutionException {
+        switch (distributionType) {
+            case "egg":
+            case "wheel":
+            case "wininst":
+            case "rpm":
+            case "dumb":
+                return "bdist_" + distributionType;
+            case "bdist":
+                return "bdist";
+            case "source":
+                return "sdist";
+            case "docs":
+                return "build_sphinx";
+            default:
+                throw new MojoExecutionException("Invalid distributionType (egg, wheel, wininst, rpm, bdist, dumb, source, or docs supported): " + distributionType);
+        }
+    }
+
     /* (non-Javadoc)
      * @see org.apache.maven.plugin.AbstractMojo#execute()
      */
     @Override
-    public void execute() throws MojoExecutionException {
-        final File buildDirectory = Paths.get(project.getBuild().getDirectory(), "maven-python").toFile();
-        final String setupOutputCanonicalPath = project.getProperties().getProperty("python.distribute.plugin.setup.path");
-
-        try {
-            String bdistName;
-            switch(distributionType) {
-                case "egg":
-                    bdistName = "bdist_egg";
-                    break;
-                case "wheel":
-                    bdistName = "bdist_wheel";
-                    break;
-                default:
-                    throw new MojoExecutionException("invalid distributionType (egg or wheel supported): " + distributionType);
-            }
-
-            //execute setup script
-            ProcessBuilder processBuilder = new ProcessBuilder(pythonExecutable, setupOutputCanonicalPath, bdistName);
-            processBuilder.directory(buildDirectory);
-
-            Process pr = processBuilder.start();
-            BufferedReader stdout = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-            BufferedReader stderr = new BufferedReader(new InputStreamReader(pr.getErrorStream()));
-            while (!pr.waitFor(100, TimeUnit.MILLISECONDS)) {
-                stdout.lines().forEachOrdered(line->getLog().info(line));
-                stderr.lines().forEachOrdered(line->getLog().error(line));
-            }
-
-            stdout.lines().forEachOrdered(line->getLog().debug(line));
-            stderr.lines().forEachOrdered(line->getLog().warn(line));
-
-            int exitCode = pr.exitValue();
-            if (exitCode != 0) {
-                throw new MojoExecutionException("python setup.py returned error code " + exitCode);
-            }
-        } catch (FileNotFoundException e) {
-            throw new MojoExecutionException("Unable to find " + setupOutputCanonicalPath, e);
-        } catch (IOException e) {
-            throw new MojoExecutionException("Unable to read " + setupOutputCanonicalPath, e);
-        } catch (InterruptedException e) {
-            throw new MojoExecutionException("Unable to execute python " + setupOutputCanonicalPath, e);
-        }
+    public void addSetupArgs(List<String> args) throws MojoExecutionException {
+        String distributionTypeArg = getDistributionTypeArg(distributionType);
+        args.add(distributionTypeArg);
+        DeployMojo.builtDistributionTypes.add(distributionTypeArg);
     }
 }
