@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.UltimateDogg</groupId>
     <artifactId>maven-python-distribute-plugin</artifactId>
-    <version>0.2.1</version>
+    <version>1.0-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
     <name>Maven Python Distribute Plugin</name>
     <url>https://github.com/UltimateDogg/maven-python-distribute-plugin</url>
@@ -176,10 +176,19 @@
         </extensions>
     </build>
 
-	<distributionManagement>
-		<repository>
-			<id>googlecode</id>
-			<url>svn:https://javabuilders.googlecode.com/svn/repo</url>
-		</repository>
-	</distributionManagement>
+    <distributionManagement>
+
+        <snapshotRepository>
+            <id>library.liveramp.net</id>
+            <name>library.liveramp.net-ext-snapshots</name>
+            <url>http://library.liveramp.net/artifactory/ext-snapshot-local</url>
+        </snapshotRepository>
+
+        <repository>
+            <id>library.liveramp.net</id>
+            <name>library.liveramp.net-ext-releases</name>
+            <url>http://library.liveramp.net/artifactory/ext-release-local</url>
+        </repository>
+
+    </distributionManagement>
 </project>
