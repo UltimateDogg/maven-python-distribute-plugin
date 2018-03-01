@@ -77,11 +77,11 @@ public abstract class AbstractSetupCommandMojo extends AbstractMojo {
             BufferedReader stderr = new BufferedReader(new InputStreamReader(pr.getErrorStream()));
             while (!pr.waitFor(100, TimeUnit.MILLISECONDS)) {
                 stdout.lines().forEachOrdered(line -> getLog().debug(line));
-                stderr.lines().forEachOrdered(line -> getLog().warn(line));
+                stderr.lines().forEachOrdered(this::logErrorOrWarning);
             }
 
             stdout.lines().forEachOrdered(line -> getLog().debug(line));
-            stderr.lines().forEachOrdered(line -> getLog().warn(line));
+            stderr.lines().forEachOrdered(this::logErrorOrWarning);
 
             int exitCode = pr.exitValue();
             if (exitCode != 0) {
