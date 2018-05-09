@@ -1,7 +1,7 @@
 Maven Python Distribute Plugin
 ==============================
 
-**version**: 0.2.5
+**version**: 0.2.6
 
 This plugin integrates the Python **distribute** module into the Maven build:
 
